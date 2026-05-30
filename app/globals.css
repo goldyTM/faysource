@@ -111,6 +111,42 @@ input[type='range'].range-slider::-moz-range-track {
   }
 }
 
+@keyframes neonSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.neon-ring {
+  position: relative;
+  z-index: 1;
+}
+
+.neon-ring::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 9999px;
+  background: radial-gradient(circle at top left, rgba(252, 211, 77, 0.55), transparent 24%),
+    radial-gradient(circle at bottom right, rgba(56, 189, 248, 0.40), transparent 18%);
+  filter: blur(18px);
+  opacity: 0.9;
+  animation: neonSpin 5s linear infinite;
+  pointer-events: none;
+}
+
+.neon-ring::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  box-shadow: 0 0 18px rgba(252, 211, 77, 0.28), 0 0 32px rgba(56, 189, 248, 0.15);
+  pointer-events: none;
+}
+
 @keyframes pulseHero {
   0%, 100% {
     opacity: 0.75;
