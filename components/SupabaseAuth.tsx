@@ -29,7 +29,7 @@ export default function SupabaseAuth({ onSessionChange }: SupabaseAuthProps) {
               email: s.user.email || null,
               is_admin: false,
             },
-          ], { returning: 'minimal' });
+          ]);
         }
       } catch (e) {
         // ignore; profile creation is best-effort here
