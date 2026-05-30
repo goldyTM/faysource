@@ -17,6 +17,15 @@ values
   ('full_access', 'Full Access', 'Unlimited supplier unlocks for 30 days.', 15000, 'monthly', null)
 on conflict (id) do nothing;
 
+-- Define function before creating any triggers
+create or replace function public.set_updated_at()
+returns trigger language plpgsql as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$;
+
 create table if not exists public.suppliers (
   id uuid default gen_random_uuid() primary key,
   name text not null,
@@ -33,6 +42,7 @@ create table if not exists public.suppliers (
   updated_at timestamptz not null default now()
 );
 
+drop trigger if exists suppliers_updated_at on public.suppliers;
 create trigger suppliers_updated_at
   before update on public.suppliers
   for each row execute function public.set_updated_at();
@@ -48,14 +58,7 @@ create table if not exists public.profiles (
   updated_at timestamptz not null default now()
 );
 
-create or replace function public.set_updated_at()
-returns trigger language plpgsql as $$
-begin
-  new.updated_at = now();
-  return new;
-end;
-$$;
-
+drop trigger if exists profiles_updated_at on public.profiles;
 create trigger profiles_updated_at
   before update on public.profiles
   for each row execute function public.set_updated_at();
@@ -77,6 +80,7 @@ create table if not exists public.payments (
   updated_at timestamptz not null default now()
 );
 
+drop trigger if exists payments_updated_at on public.payments;
 create trigger payments_updated_at
   before update on public.payments
   for each row execute function public.set_updated_at();
@@ -105,6 +109,7 @@ create table if not exists public.user_access (
   updated_at timestamptz not null default now()
 );
 
+drop trigger if exists user_access_updated_at on public.user_access;
 create trigger user_access_updated_at
   before update on public.user_access
   for each row execute function public.set_updated_at();
@@ -112,18 +117,22 @@ create trigger user_access_updated_at
 alter table if exists public.profiles enable row level security;
 alter table if exists public.suppliers enable row level security;
 
-create policy if not exists "Authenticated can select profiles" on public.profiles
+drop policy if exists "Authenticated can select profiles" on public.profiles;
+create policy "Authenticated can select profiles" on public.profiles
   for select using (auth.role() in ('authenticated', 'anon'));
 
-create policy if not exists "Authenticated can select suppliers" on public.suppliers
+drop policy if exists "Authenticated can insert own profile" on public.profiles;
+create policy "Authenticated can insert own profile" on public.profiles
+  for insert with check (auth.role() = 'authenticated' and auth.uid() = new.id);
+
+drop policy if exists "Authenticated can select suppliers" on public.suppliers;
+create policy "Authenticated can select suppliers" on public.suppliers
   for select using (auth.role() in ('authenticated', 'anon'));
 
-create policy if not exists "Admins can insert suppliers" on public.suppliers
-  for insert with check (exists(select 1 from public.profiles where id = auth.uid() and is_admin = true));
+drop policy if exists "Admins can update suppliers" on public.suppliers;
+create policy "Admins can update suppliers" on public.suppliers
+  for update using (exists(select 1 from public.profiles where id = auth.uid() and is_admin = true));
 
-create policy if not exists "Admins can update suppliers" on public.suppliers
-  for update using (exists(select 1 from public.profiles where id = auth.uid() and is_admin = true))
-  with check (exists(select 1 from public.profiles where id = auth.uid() and is_admin = true));
-
-create policy if not exists "Admins can delete suppliers" on public.suppliers
+drop policy if exists "Admins can delete suppliers" on public.suppliers;
+create policy "Admins can delete suppliers" on public.suppliers
   for delete using (exists(select 1 from public.profiles where id = auth.uid() and is_admin = true));

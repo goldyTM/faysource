@@ -114,8 +114,8 @@ export default function SupabasePayments({ session }: SupabasePaymentsProps) {
     <section className="rounded-3xl border border-border bg-panel p-6 shadow-glow">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.32em] text-neutral-400">Supabase payments</p>
-          <h2 className="mt-2 text-2xl font-semibold text-white">Record purchases</h2>
+          <p className="text-xs uppercase tracking-[0.32em] text-neutral-400">Premium access</p>
+          <h2 className="mt-2 text-2xl font-semibold text-white">Unlock supplier contacts</h2>
         </div>
         {accessPlan ? (
           <span className="rounded-full border border-sky-400/20 bg-sky-400/10 px-3 py-1 text-xs text-sky-200">{accessPlan === 'full_access' ? 'Full access active' : 'Purchase recorded'}</span>
@@ -139,7 +139,7 @@ export default function SupabasePayments({ session }: SupabasePaymentsProps) {
                 disabled={isLoading}
                 className="mt-4 inline-flex rounded-full bg-gold px-4 py-3 text-sm font-semibold text-page transition hover:bg-yellow-400 disabled:cursor-not-allowed disabled:opacity-60 sm:mt-0"
               >
-                {isLoading ? 'Recording...' : `Record ${plan.id === 'full_access' ? 'Full Access' : 'Supplier Unlock'}`}
+                {isLoading ? 'Processing...' : `Purchase ${plan.id === 'full_access' ? 'full access' : 'supplier unlock'}`}
               </button>
             </div>
           </div>
@@ -147,7 +147,7 @@ export default function SupabasePayments({ session }: SupabasePaymentsProps) {
       </div>
 
       {status ? <p className="mt-4 text-sm text-neutral-300">{status}</p> : null}
-      <p className="mt-4 text-xs text-neutral-500">This is a plug-and-play placeholder flow: it records the purchase in Supabase now, and you can replace the gateway later in <code>lib/paymentProvider.ts</code>.</p>
+      <p className="mt-4 text-xs text-neutral-500">This payment flow is a temporary implementation. Replace the gateway in <code>lib/paymentProvider.ts</code> before production.</p>
     </section>
   );
 }

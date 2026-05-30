@@ -69,7 +69,7 @@ export default function SupplierCard({ supplier, onPreview, isLocked = false }: 
             onClick={handleChatClick}
             className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 px-4 py-3 text-sm font-semibold text-page shadow-[0_12px_35px_rgba(252,211,77,0.35)] transition hover:from-amber-300 hover:to-yellow-400"
           >
-            Unlock for $5
+            Unlock contact
           </button>
         ) : (
           <a

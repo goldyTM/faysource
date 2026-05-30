@@ -2,14 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Supplier } from '../types/supplier';
-import type { Session } from '@supabase/supabase-js';
 import SupplierCard from '../components/SupplierCard';
 import SkeletonCard from '../components/SkeletonCard';
 import SupplierPreviewModal from '../components/SupplierPreviewModal';
 import PaywallModal from '../components/PaywallModal';
-import SupabaseAuth from '../components/SupabaseAuth';
-import SupabasePayments from '../components/SupabasePayments';
-import SupabaseAdmin from '../components/SupabaseAdmin';
 import { supabase } from '../lib/supabaseClient';
 import CommunicationGuide from '../components/CommunicationGuide';
 import FaqsAndGuide from '../components/FaqsAndGuide';
@@ -39,7 +35,6 @@ export default function Home() {
   const [itemWeight, setItemWeight] = useState(2);
   const [previewSupplier, setPreviewSupplier] = useState<Supplier | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const [session, setSession] = useState<Session | null>(null);
   const [accessMode, setAccessMode] = useState<'free' | 'single' | 'full'>('free');
   const [unlockedSupplier, setUnlockedSupplier] = useState<string | null>(null);
   const [selectedLockedSupplier, setSelectedLockedSupplier] = useState<Supplier | null>(null);
@@ -243,9 +238,6 @@ export default function Home() {
           </div>
 
           <aside className="space-y-6">
-            <SupabaseAuth onSessionChange={setSession} />
-            <SupabasePayments session={session} />
-            <SupabaseAdmin session={session} />
             <article id="calculator" className="rounded-3xl border border-border bg-panel p-6 shadow-glow">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
@@ -368,38 +360,6 @@ export default function Home() {
                 <h2 className="mt-3 text-3xl font-semibold">Verified suppliers</h2>
                 <p className="mt-3 max-w-2xl text-neutral-300">Search by manufacturer, niche, and shipping routes for the best China-to-Africa manufacturer match.</p>
               </div>
-              <div className="flex flex-wrap gap-2">
-                {countries.map((country) => (
-                  <button
-                    key={country}
-                    type="button"
-                    onClick={() => setActiveCountry((current) => (current === country ? '' : country))}
-                    className={`rounded-full border px-4 py-2 text-sm transition ${
-                      activeCountry === country
-                        ? 'border-gold bg-gold/15 text-gold'
-                        : 'border-white/10 bg-white/5 text-neutral-300 hover:border-white/20 hover:bg-white/10'
-                    }`}
-                  >
-                    {country}
-                  </button>
-                ))}
-              </div>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {categories.slice(0, 8).map((category) => (
-                  <button
-                    key={category}
-                    type="button"
-                    onClick={() => setActiveCategory((current) => (current === category ? '' : category))}
-                    className={`rounded-full border px-4 py-2 text-sm transition ${
-                      activeCategory === category
-                        ? 'border-sky-400 bg-sky-400/15 text-sky-300'
-                        : 'border-white/10 bg-white/5 text-neutral-300 hover:border-white/20 hover:bg-white/10'
-                    }`}
-                  >
-                    {category}
-                  </button>
-                ))}
-              </div>
             </div>
 
             <div className="mt-6 rounded-3xl border border-gold/20 bg-gradient-to-br from-gold/5 to-transparent p-4 text-sm text-neutral-200">
@@ -437,11 +397,44 @@ export default function Home() {
                   />
                 </label>
                 <p className="text-sm text-neutral-400">Try: electronics, fashion, packaging, mobile parts, beauty, Nigeria</p>
+
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {countries.map((country) => (
+                    <button
+                      key={country}
+                      type="button"
+                      onClick={() => setActiveCountry((current) => (current === country ? '' : country))}
+                      className={`rounded-full border px-4 py-2 text-sm transition ${
+                        activeCountry === country
+                          ? 'border-gold bg-gold/15 text-gold'
+                          : 'border-white/10 bg-white/5 text-neutral-300 hover:border-white/20 hover:bg-white/10'
+                      }`}
+                    >
+                      {country}
+                    </button>
+                  ))}
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {categories.slice(0, 8).map((category) => (
+                    <button
+                      key={category}
+                      type="button"
+                      onClick={() => setActiveCategory((current) => (current === category ? '' : category))}
+                      className={`rounded-full border px-4 py-2 text-sm transition ${
+                        activeCategory === category
+                          ? 'border-sky-400 bg-sky-400/15 text-sky-300'
+                          : 'border-white/10 bg-white/5 text-neutral-300 hover:border-white/20 hover:bg-white/10'
+                      }`}
+                    >
+                      {category}
+                    </button>
+                  ))}
+                </div>
               </div>
               <div className="rounded-3xl border border-white/10 bg-white/5 p-4 text-sm text-neutral-300">
                 <p className="text-xs uppercase tracking-[0.32em] text-neutral-400">Live result</p>
                 <p className="mt-3 text-lg font-semibold text-white">{supplierStatus}</p>
-                {supplierError ? <p className="mt-2 text-sm text-red-300">Supplier load failed. Check your Supabase schema and row-level security policies.</p> : null}
+                {supplierError ? <p className="mt-2 text-sm text-red-300">Supplier load failed. Check your database schema or row-level security settings.</p> : null}
               </div>
             </div>
           </div>

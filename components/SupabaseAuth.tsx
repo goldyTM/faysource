@@ -17,15 +17,36 @@ export default function SupabaseAuth({ onSessionChange }: SupabaseAuthProps) {
   useEffect(() => {
     let mounted = true;
 
+    const ensureProfile = async (s: Session | null) => {
+      if (!s) return;
+      try {
+        const { data } = await supabase.from('profiles').select('id').eq('id', s.user.id).maybeSingle();
+        if (!data) {
+          await supabase.from('profiles').insert([
+            {
+              id: s.user.id,
+              full_name: (s.user.user_metadata && (s.user.user_metadata as any).full_name) || null,
+              email: s.user.email || null,
+              is_admin: false,
+            },
+          ], { returning: 'minimal' });
+        }
+      } catch (e) {
+        // ignore; profile creation is best-effort here
+      }
+    };
+
     supabase.auth.getSession().then(({ data }) => {
       if (!mounted) return;
       setSession(data.session);
       onSessionChange?.(data.session);
+      ensureProfile(data.session);
     });
 
     const { data: listener } = supabase.auth.onAuthStateChange((_, authSession) => {
       setSession(authSession);
       onSessionChange?.(authSession);
+      ensureProfile(authSession);
     });
 
     return () => {
@@ -57,7 +78,7 @@ export default function SupabaseAuth({ onSessionChange }: SupabaseAuthProps) {
       return;
     }
 
-    setMessage('Magic link sent. Check your email to sign in.');
+    setMessage('Sign-in link sent. Check your email to access admin tools.');
   };
 
   const handleSignOut = async () => {
@@ -75,7 +96,7 @@ export default function SupabaseAuth({ onSessionChange }: SupabaseAuthProps) {
         <div className="flex items-center justify-between gap-4">
           <div>
             <p className="text-xs uppercase tracking-[0.32em] text-neutral-400">Account</p>
-            <h2 className="mt-2 text-2xl font-semibold text-white">Supabase login</h2>
+            <h2 className="mt-2 text-2xl font-semibold text-white">Admin sign-in</h2>
           </div>
           {session ? (
             <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-200">Signed in</span>

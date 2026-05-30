@@ -16,7 +16,7 @@ export default function AdminPage() {
           <div className="space-y-4">
             <p className="text-sm uppercase tracking-[0.32em] text-neutral-400">Admin dashboard</p>
             <h1 className="text-4xl font-semibold">Manage suppliers</h1>
-            <p className="max-w-2xl text-neutral-300">Use this page to sign in with your Supabase admin account and add new supplier records to the catalog.</p>
+            <p className="max-w-2xl text-neutral-300">Use this page to sign in with your admin account and add new supplier records to the catalog.</p>
           </div>
           <div className="mt-6 rounded-3xl border border-white/10 bg-white/5 px-5 py-4 text-sm text-neutral-300">
             <p className="font-semibold text-white">Admin page status</p>
